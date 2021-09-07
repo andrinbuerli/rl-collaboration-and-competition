@@ -1,5 +1,6 @@
 import os
 import wandb
+import torch.nn as nn
 
 from lib.log.BaseLogger import BaseLogger
 
@@ -12,6 +13,7 @@ class WandbLogger(BaseLogger):
             api_key: str,
             config: dict,
             entity: str = None,
+            models: [nn.Module] = [],
             run_name: str = None):
         super().__init__(config=config)
 
@@ -19,6 +21,7 @@ class WandbLogger(BaseLogger):
         wandb.login()
 
         self.run: wandb = wandb.init(project=wandb_project_name, entity=entity, name=run_name)
+        self.graphs = wandb.watch(models, log_freq=1, log="all")
         wandb.config.update(self.config)
 
     def log(self, data: dict):
