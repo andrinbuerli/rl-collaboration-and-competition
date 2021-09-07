@@ -1,0 +1,15 @@
+wandb==0.12.0
+#torch==1.9.0
+pytest==6.2.4
+
+
+# dependencies of unityagents (except tensorflow)
+grpcio>=1.11.0
+h5py>=2.9.0
+numpy>=1.13.3,<2.0
+Pillow>=4.2.1
+protobuf>=3.6
+pyyaml>=3.1.0
+
+cattrs<1.1.0
+attrs>=19.3.0
