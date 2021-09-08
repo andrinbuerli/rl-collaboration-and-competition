@@ -185,12 +185,12 @@ class RLAgentTrainer:
         }
 
     def __log_and_metrics(self, t_sampled):
-        mean_score = self.trajectory_scores.mean()
-        self.scores_window.append(mean_score)  # save most recent score
-        self.scores.append(mean_score)  # save most recent score
+        max_score = self.trajectory_scores.max()
+        self.scores_window.append(max_score)  # save most recent score
+        self.scores.append(max_score)  # save most recent score
         if self.logger is not None:
             self.logger.log({
-                "reward": mean_score,
+                "reward": max_score,
                 "trajectory_length": t_sampled,
                 **self.agent.get_log_dict()
             })
