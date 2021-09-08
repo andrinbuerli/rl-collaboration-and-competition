@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     env = ParallelAgentsUnityEnvironment(
         name="Tennis",
-        target_reward=0.5,
+        target_reward=2.5,
         env_binary_path='../environments/Tennis_Linux_NoVis/Tennis.x86_64')
 
     policy = lambda: DeterministicContinuousGaussianPolicy(
