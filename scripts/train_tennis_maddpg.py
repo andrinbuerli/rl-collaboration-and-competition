@@ -36,7 +36,7 @@ if __name__ == "__main__":
             "api_key": "",
             "grad_clip_max": None,
             "seed": int(np.random.randint(0, 1e10, 1)[0]),
-            "agent_weights": None
+            "agent_weights": "agents/Tennis-DDPG-1931904030-best-1.53"
         })
 
     env = ParallelAgentsUnityEnvironment(

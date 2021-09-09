@@ -21,7 +21,7 @@ class WandbLogger(BaseLogger):
         wandb.login()
 
         self.run: wandb = wandb.init(project=wandb_project_name, entity=entity, name=run_name)
-        self.graphs = wandb.watch(models, log_freq=1, log="all")
+        self.graphs = wandb.watch(models, log_freq=100, log="all")
         wandb.config.update(self.config)
 
     def log(self, data: dict):
