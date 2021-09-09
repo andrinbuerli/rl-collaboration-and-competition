@@ -151,7 +151,7 @@ class RLAgentTrainer:
                 break
 
             self.states = next_states
-            self.trajectory_scores = self.trajectory_scores * (1 - np.array(dones)) + rewards
+            self.trajectory_scores = self.trajectory_scores + rewards
             t += 1
             if t >= max_t or np.all(dones):
                 if np.all(dones) or t >= t_max_episode\
@@ -168,6 +168,7 @@ class RLAgentTrainer:
 
                 if intercept:
                     break
+
 
         if not intercept:
             self.__log_and_metrics(t)
