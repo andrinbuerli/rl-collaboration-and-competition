@@ -30,13 +30,13 @@ if __name__ == "__main__":
             "update_every": 1,
             "learning_rate": 0.0001,
             "update_for": 4,
-            "n_iterations": int(1e7),
+            "n_iterations": int(1e8),
             "max_t": 128,
             "enable_log": 0,
             "api_key": "",
             "grad_clip_max": None,
             "seed": int(np.random.randint(0, 1e10, 1)[0]),
-            "agent_weights": "agents/Tennis-DDPG-1931904030-best-1.53"
+            "agent_weights": None
         })
 
     env = ParallelAgentsUnityEnvironment(
