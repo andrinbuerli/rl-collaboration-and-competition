@@ -160,14 +160,13 @@ class DDPGRLAgent(BaseRLAgent):
                                                      dones.reshape(states.shape[0] * states.shape[1], -1)):
             self.memory.add(state, action, reward, next_state, done)
 
-        if len(self.memory) > self.replay_min_size:
+        if len(self.memory) > self.replay_min_size and (self.t_step + 1) % self.update_every == 0:
             for _ in range(self.update_for):
                 # If enough samples are available in memory, get random subset and learn
                 experiences = self.memory.sample()
 
                 self.__learn(experiences)
 
-            if (self.t_step + 1) % self.update_every == 0:
                 self.__soft_update(self.qnetwork_local, self.qnetwork_target)
                 self.__soft_update(self.argmaxpolicy_local, self.argmaxpolicy_target)
 
