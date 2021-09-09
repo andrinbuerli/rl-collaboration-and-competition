@@ -182,9 +182,9 @@ class MADDPGRLAgent(BaseRLAgent):
 
                 self.__learn(experiences)
 
-            for agent in self.agents:
-                self.__soft_update(agent.critic_local, agent.critic_target)
-                self.__soft_update(agent.actor_local, agent.actor_target)
+                for agent in self.agents:
+                    self.__soft_update(agent.critic_local, agent.critic_target)
+                    self.__soft_update(agent.actor_local, agent.actor_target)
 
             self.eps = max(self.eps * self.eps_decay, self.epsilon_min)
 
