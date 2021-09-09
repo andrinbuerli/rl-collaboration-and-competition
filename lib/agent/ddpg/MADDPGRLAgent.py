@@ -175,17 +175,16 @@ class MADDPGRLAgent(BaseRLAgent):
                 np.transpose(dones, axes=[1, 0]))):
             self.memory.add(s_t, a_t, r_t1, s_t1, d_t1)
 
-        if len(self.memory) > self.replay_min_size:
+        if len(self.memory) > self.replay_min_size and (self.t_step + 1) % self.update_every == 0:
             for _ in range(self.update_for):
                 # If enough samples are available in memory, get random subset and learn
                 experiences = self.memory.sample()
 
                 self.__learn(experiences)
 
-            if (self.t_step + 1) % self.update_every == 0:
-                for agent in self.agents:
-                    self.__soft_update(agent.critic_local, agent.critic_target)
-                    self.__soft_update(agent.actor_local, agent.actor_target)
+            for agent in self.agents:
+                self.__soft_update(agent.critic_local, agent.critic_target)
+                self.__soft_update(agent.actor_local, agent.actor_target)
 
             self.eps = max(self.eps * self.eps_decay, self.epsilon_min)
 
