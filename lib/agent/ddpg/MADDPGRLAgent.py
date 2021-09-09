@@ -200,7 +200,7 @@ class MADDPGRLAgent(BaseRLAgent):
             self.eps = max(self.eps * self.eps_decay, self.epsilon_min)
 
     def get_name(self) -> str:
-        return "MADDPG"
+        return f"{'S' if self.single_agent else ''}MADDPG"
 
     def reset(self):
         return self.random_process.reset_states()
