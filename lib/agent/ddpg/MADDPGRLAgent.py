@@ -53,6 +53,7 @@ class MADDPGRLAgent(BaseRLAgent):
             epsilon_min: float = .01,
             grad_clip_max: float = None,
             n_agents: int = 2,
+            single_agent: bool = False,
             device="cpu"
     ):
         """
@@ -80,6 +81,7 @@ class MADDPGRLAgent(BaseRLAgent):
         @param epsilon_min:
         @param device: the device on which the calculations are to be executed
         """
+        self.single_agent = single_agent
         self.n_agents = n_agents
         self.replay_min_size = replay_min_size
         self.grad_clip_max = grad_clip_max
@@ -104,11 +106,17 @@ class MADDPGRLAgent(BaseRLAgent):
 
         super(MADDPGRLAgent, self).__init__(models=[], device=device, learning_rate=lr, model_names=[])
 
-        self.agents = [
-            __SingleDDPGAgent__(get_actor=get_actor, get_critic=get_critic, get_optimizer=self._get_optimizer,
-                                device=device)
-            for _ in range(self.n_agents)
-        ]
+        if single_agent:
+            self.agents = [
+                __SingleDDPGAgent__(get_actor=get_actor, get_critic=get_critic, get_optimizer=self._get_optimizer,
+                                    device=device)
+            ]
+        else:
+            self.agents = [
+                __SingleDDPGAgent__(get_actor=get_actor, get_critic=get_critic, get_optimizer=self._get_optimizer,
+                                    device=device)
+                for _ in range(self.n_agents)
+            ]
 
         self.models = [[x.actor_local, x.actor_target, x.critic_local, x.critic_target] for x in self.agents]
         self.model_names = [[f"agent{i}-actor_local", f"agent{i}-actor_target", f"agent{i}-critic_local",
@@ -142,7 +150,10 @@ class MADDPGRLAgent(BaseRLAgent):
 
         [agent.actor_local.eval() for agent in self.agents]
         with torch.no_grad():
-            actions = torch.stack([agent.actor_local(obs) for obs, agent in list(zip(states, self.agents))])
+            if self.single_agent:
+                actions = self.agents[0].actor_local(states)
+            else:
+                actions = torch.stack([agent.actor_local(obs) for obs, agent in list(zip(states, self.agents))])
         [agent.actor_local.train() for agent in self.agents]
 
         actions = actions.detach().cpu().numpy()
@@ -189,7 +200,7 @@ class MADDPGRLAgent(BaseRLAgent):
             self.eps = max(self.eps * self.eps_decay, self.epsilon_min)
 
     def get_name(self) -> str:
-        return "DDPG"
+        return "MADDPG"
 
     def reset(self):
         return self.random_process.reset_states()
@@ -216,44 +227,76 @@ class MADDPGRLAgent(BaseRLAgent):
         actor_losses = []
         critic_losses = []
 
-        for i_agent in range(self.n_agents):
-            agent = self.agents[i_agent]
-
-            target_actions = torch.stack(
-                [agent.actor_target(obs) for obs, agent in list(zip(next_states.transpose(dim0=0, dim1=1), self.agents))],
-                dim=1).reshape(next_states.shape[0], -1)
+        if self.single_agent:
+            target_actions = self.agents[0].actor_target(next_states).view(next_states.shape[0], -1)
 
             with torch.no_grad():
-                q_next = agent.critic_target(next_obs_full, target_actions)
+                q_next = self.agents[0].critic_target(next_obs_full, target_actions)
 
-            q_target = rewards[:, i_agent].view(-1, 1) + self.gamma * q_next * (1 - dones[:, i_agent].view(-1, 1))
+            q_target = rewards.sum(dim=1).view(-1, 1) + self.gamma * q_next * (1 - dones.max(dim=1)[0].view(-1, 1))
             action = actions.reshape(actions.shape[0], -1)
-            q_values = agent.critic_local(obs_full, action)
+            q_values = self.agents[0].critic_local(obs_full, action)
 
             critic_loss = ((q_values - q_target) ** 2).mean()
 
-            agent.critic_optimizer.zero_grad()
+            self.agents[0].critic_optimizer.zero_grad()
             critic_loss.backward()
             if self.grad_clip_max is not None:
-                torch.nn.utils.clip_grad_norm_(agent.critic_local.parameters(), self.grad_clip_max)
-            agent.critic_optimizer.step()
+                torch.nn.utils.clip_grad_norm_(self.agents[0].critic_local.parameters(), self.grad_clip_max)
+            self.agents[0].critic_optimizer.step()
 
-            action = torch.stack([
-                self.agents[i].actor_local(obs) if i == i_agent
-                else self.agents[i].actor_local(obs).detach()
-                for i, obs in enumerate(states.transpose(dim0=0, dim1=1))
-            ], dim=1).reshape(states.shape[0], -1)
+            action = self.agents[0].actor_local(states).view(states.shape[0], -1)
 
-            actor_loss = -agent.critic_local(obs_full, action).mean()
+            actor_loss = -self.agents[0].critic_local(obs_full, action).mean()
 
-            agent.actor_optimizer.zero_grad()
+            self.agents[0].actor_optimizer.zero_grad()
             actor_loss.backward()
             if self.grad_clip_max is not None:
-                torch.nn.utils.clip_grad_norm_(agent.actor_local.parameters(), self.grad_clip_max)
-            agent.actor_optimizer.step()
+                torch.nn.utils.clip_grad_norm_(self.agents[0].actor_local.parameters(), self.grad_clip_max)
+            self.agents[0].actor_optimizer.step()
 
             actor_losses.append(actor_loss.detach().cpu().numpy())
             critic_losses.append(critic_loss.detach().cpu().numpy())
+        else:
+            for i_agent in range(self.n_agents):
+                agent = self.agents[i_agent]
+
+                target_actions = torch.stack(
+                    [agent.actor_target(obs) for obs, agent in
+                     list(zip(next_states.transpose(dim0=0, dim1=1), self.agents))],
+                    dim=1).reshape(next_states.shape[0], -1)
+
+                with torch.no_grad():
+                    q_next = agent.critic_target(next_obs_full, target_actions)
+
+                q_target = rewards[:, i_agent].view(-1, 1) + self.gamma * q_next * (1 - dones[:, i_agent].view(-1, 1))
+                action = actions.reshape(actions.shape[0], -1)
+                q_values = agent.critic_local(obs_full, action)
+
+                critic_loss = ((q_values - q_target) ** 2).mean()
+
+                agent.critic_optimizer.zero_grad()
+                critic_loss.backward()
+                if self.grad_clip_max is not None:
+                    torch.nn.utils.clip_grad_norm_(agent.critic_local.parameters(), self.grad_clip_max)
+                agent.critic_optimizer.step()
+
+                action = torch.stack([
+                    self.agents[i].actor_local(obs) if i == i_agent
+                    else self.agents[i].actor_local(obs).detach()
+                    for i, obs in enumerate(states.transpose(dim0=0, dim1=1))
+                ], dim=1).reshape(states.shape[0], -1)
+
+                actor_loss = -agent.critic_local(obs_full, action).mean()
+
+                agent.actor_optimizer.zero_grad()
+                actor_loss.backward()
+                if self.grad_clip_max is not None:
+                    torch.nn.utils.clip_grad_norm_(agent.actor_local.parameters(), self.grad_clip_max)
+                agent.actor_optimizer.step()
+
+                actor_losses.append(actor_loss.detach().cpu().numpy())
+                critic_losses.append(critic_loss.detach().cpu().numpy())
 
         self.critic_loss = np.mean(critic_losses)
         self.actor_loss = np.mean(actor_losses)
