@@ -7,7 +7,7 @@ sys.path.append("../")
 
 from lib.helper import parse_config_for, extract_config_from
 from lib.env.ParallelAgentsUnityEnvironment import ParallelAgentsUnityEnvironment
-from lib.models.policy.DeterministicContinuousGaussianPolicy import DeterministicContinuousGaussianPolicy
+from lib.models.policy.DeterministicContinuousPolicy import DeterministicContinuousPolicy
 from lib.models.function.StateActionValueFunction import StateActionValueFunction
 from lib.RLAgentTrainer import RLAgentTrainer
 from lib.agent.ddpg.MADDPGRLAgent import MADDPGRLAgent
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         target_reward=2.5,
         env_binary_path='../environments/Tennis_Linux_NoVis/Tennis.x86_64')
 
-    policy = lambda: DeterministicContinuousGaussianPolicy(
+    policy = lambda: DeterministicContinuousPolicy(
         state_size=env.state_size, action_size=env.action_size,
         seed=int(np.random.randint(0, 1e10, 1)[0]), output_transform=lambda x: torch.tanh(x))
     value_function = lambda: StateActionValueFunction(

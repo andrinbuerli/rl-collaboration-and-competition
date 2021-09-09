@@ -5,7 +5,7 @@ import torch.nn as nn
 from lib.models.policy.DeterministicBasePolicy import DeterministicBasePolicy
 
 
-class DeterministicContinuousGaussianPolicy(DeterministicBasePolicy):
+class DeterministicContinuousPolicy(DeterministicBasePolicy):
     def __init__(
             self,
             state_size: int,
