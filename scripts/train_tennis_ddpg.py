@@ -48,8 +48,8 @@ if __name__ == "__main__":
         state_size=env.state_size, action_size=env.action_size,
         seed=int(np.random.randint(0, 1e10, 1)[0]), output_transform=lambda x: torch.tanh(x))
     value_function = lambda: StateActionValueFunction(
-        state_size=env.state_size * env.num_agents,
-        action_size=env.action_size * env.num_agents,
+        state_size=env.state_size,
+        action_size=env.action_size,
         seed=int(np.random.randint(0, 1e10, 1)[0]))
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
