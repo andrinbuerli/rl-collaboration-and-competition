@@ -21,11 +21,11 @@ if __name__ == "__main__":
         config_objects={
             "gamma": 0.99,
             "epsilon": 1.0,
-            "epsilon_decay": .9995,
+            "epsilon_decay": .99995,
             "epsilon_min": 0.05,
             "buffer_size": int(1e6),
             "min_buffer_size": int(1e5),
-            "batch_size": 1024,
+            "batch_size": 128,
             "tau": 1e-3,
             "update_every": 4,
             "learning_rate": 0.0001,
