@@ -94,8 +94,8 @@ class DDPGRLAgent(BaseRLAgent):
             learning_rate=lr,
             model_names=["qnetwork_local", "qnetwork_target", "policy_local", "policy_target"])
 
-        self.qnetwork_optimizer = self._get_optimizer(self.qnetwork_local.parameters())
-        self.argmaxpolicy_optimizer = self._get_optimizer(self.argmaxpolicy_local.parameters())
+        self.qnetwork_optimizer = self._get_optimizer(self.qnetwork_local)
+        self.argmaxpolicy_optimizer = self._get_optimizer(self.argmaxpolicy_local)
 
         # Replay memory
         if self.prioritized_exp_replay:
