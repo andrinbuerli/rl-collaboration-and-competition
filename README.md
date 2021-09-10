@@ -1,6 +1,5 @@
 [//]: # "Image References"
 
-[image1]: https://user-images.githubusercontent.com/10624937/42135623-e770e354-7d12-11e8-998d-29fc74429ca2.gif "Trained Agent"
 [image2]: https://user-images.githubusercontent.com/10624937/42135622-e55fb586-7d12-11e8-8a54-3c31da15a90a.gif "Soccer"
 
 
@@ -14,9 +13,9 @@ In this project, multiple agents are trained to interact in two different enviro
 
 The first environment is called *Tennis*. Two agents are tasked to control a separate tennis rackets in such a way that they can pass the ball between them as many times as possible. If an agent hits the ball over the net, it receives a reward of +0.1.  If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01.  Thus, the goal of each agent is to collaborate with each other and keep the ball in play for as long as possible.
 
-| Initial (random) policy: |     Learned policy:      |
-| :----------------------: | :----------------------: |
-| ![Trained Agent][image1] | ![Trained Agent][image1] |
+|      Initial (random) policy:       |      Learned policy (MADDPG):       |
+| :---------------------------------: | :---------------------------------: |
+| <img src="imgs/initial_tennis.gif"> | <img src="imgs/learned_tennis.gif"> |
 
 The observation space consists of 8 variables corresponding to the position and velo city of the ball and racket. Each agent receives its own, local observation.  Two continuous actions are available, corresponding to movement toward (or away from) the net, and jumping. In order to solve the environment, the agents must get an average score of +0.5 over 100 consecutive episodes, after taking the maximum over both agents. 
 
@@ -29,9 +28,9 @@ The second environment is called *Soccer*. In this environment there are 4 agent
 
  Thus the goal of each team is to collaboratively and competitively get the ball into the opponent's goal while preventing the ball from entering it's own goal.
 
-| Initial (random) policy: |  Learned policy:  |
-| :----------------------: | :---------------: |
-|    ![Soccer][image2]     | ![Soccer][image2] |
+| Initial (random) policy: |    Learned policy:    |
+| :----------------------: | :-------------------: |
+|    ![Soccer][image2]     | ![Soccer][image2]TBD! |
 
 The observation space consists of 336 variables corresponding to 11 ray-casts forward distributed over 120 degrees and 3 ray-casts backward distributed over 90 degrees each detecting 6 possible object types, along with the object's distance. The forward ray-casts contribute 264 state dimensions and backward 72 state dimensions over three observation stacks. The action space has 3 continuous dimensions corresponding to forward, backward, sideways movement, as well as rotation.
 
