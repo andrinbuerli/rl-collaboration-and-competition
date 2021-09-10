@@ -28,9 +28,9 @@ The second environment is called *Soccer*. In this environment there are 4 agent
 
  Thus the goal of each team is to collaboratively and competitively get the ball into the opponent's goal while preventing the ball from entering it's own goal.
 
-| Initial (random) policy: |    Learned policy:    |
-| :----------------------: | :-------------------: |
-|    ![Soccer][image2]     | ![Soccer][image2]TBD! |
+|      Initial (random) policy:       |             Learned policy:             |
+| :---------------------------------: | :-------------------------------------: |
+| <img src="imgs/initial_soccer.gif"> | <img src="imgs/initial_soccer.gif">TBD! |
 
 The observation space consists of 336 variables corresponding to 11 ray-casts forward distributed over 120 degrees and 3 ray-casts backward distributed over 90 degrees each detecting 6 possible object types, along with the object's distance. The forward ray-casts contribute 264 state dimensions and backward 72 state dimensions over three observation stacks. The action space has 3 continuous dimensions corresponding to forward, backward, sideways movement, as well as rotation.
 
