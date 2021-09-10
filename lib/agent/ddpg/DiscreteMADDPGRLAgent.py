@@ -250,7 +250,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
                 for i, (obs, agent, a_s) in enumerate(zip(next_states.transpose(dim0=0, dim1=1), self.agents, self.action_size))
             ]
 
-            action_probs = action[i_agent]
+            action_probs = action[i_agent].to(self.device)
 
             expected_q_value = torch.zeros((batch_size, 1))
 
