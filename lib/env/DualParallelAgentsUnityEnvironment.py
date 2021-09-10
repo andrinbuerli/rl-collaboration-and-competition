@@ -10,7 +10,9 @@ class DualParallelAgentsUnityEnvironment(ParallelAgentsBaseEnvironment):
             self,
             name: str,
             target_reward: float,
-            env_binary_path: str = 'Reacher_Linux_NoVis/Reacher.x86_64'):
+            env_binary_path: str = 'Reacher_Linux_NoVis/Reacher.x86_64',
+            train_mode: bool = True):
+        self.train_mode = train_mode
         self.name = name
         self.env = UnityEnvironment(file_name=env_binary_path)
         self.brain_name1 = self.env.brain_names[0]
@@ -24,7 +26,7 @@ class DualParallelAgentsUnityEnvironment(ParallelAgentsBaseEnvironment):
         action_type = {}
         state_size = {}
 
-        env_info = self.env.reset(train_mode=True)
+        env_info = self.env.reset(train_mode=self.train_mode)
         # reset the environment
         for brain_name in self.brain_names:
             # number of agents
@@ -53,7 +55,7 @@ class DualParallelAgentsUnityEnvironment(ParallelAgentsBaseEnvironment):
             num_agents=num_agents, target_reward=target_reward, name=name)
 
     def reset(self) -> np.ndarray:
-        env_info = self.env.reset(train_mode=True)  # reset the environment
+        env_info = self.env.reset(train_mode=self.train_mode)  # reset the environment
 
         observations = [env_info[brain_name].vector_observations for brain_name in self.brain_names]
 
