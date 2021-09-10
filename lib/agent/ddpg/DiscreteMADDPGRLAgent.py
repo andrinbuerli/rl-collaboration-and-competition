@@ -148,7 +148,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
         if np.random.rand() < (eps if eps is not None else self.eps):
             actions = np.array([np.random.choice(a_size) for a_size in self.action_size])
         else:
-            actions = np.array([a.argmax().detach().numpy() for a in actions])
+            actions = np.array([a.argmax().cpu().detach().numpy() for a in actions])
 
         return {
             "actions": actions,
