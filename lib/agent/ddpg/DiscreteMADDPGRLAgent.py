@@ -252,7 +252,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
 
             action_probs = action[i_agent].to(self.device)
 
-            expected_q_value = torch.zeros((batch_size, 1))
+            expected_q_value = torch.zeros((batch_size, 1)).to(self.device)
 
             action_space_size = action_probs.shape[1]
             for i in range(action_space_size):
@@ -263,7 +263,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
 
                 actions_one_hot = torch.stack([torch.cat([l[i] for l in ap]) for i in range(batch_size)]).to(self.device)
 
-                expected_q_value += torch.log(action_probs[:, i].view(-1, 1)).to(self.device) * agent.critic_local(obs_full, actions_one_hot)
+                expected_q_value += torch.log(action_probs[:, i].view(-1, 1)) * agent.critic_local(obs_full, actions_one_hot)
 
             actor_loss = -expected_q_value.mean()
 
