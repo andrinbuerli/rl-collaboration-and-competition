@@ -1,0 +1,42 @@
+version: '2.3'
+services:
+    train_tennis_maddpg:
+        build: .
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=0
+        volumes:
+            - .:/app
+        command: >
+            bash -c "cd scripts && python train_tennis_maddpg.py
+            --api_key <API-KEY>
+            --enable_log 1"
+    train_soccer_maddpg:
+        build: .
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=0
+        volumes:
+            - .:/app
+        command: >
+            bash -c "cd scripts && python train_soccer_maddpg.py
+            --api_key <API-KEY>
+            --enable_log 1"
+    train_tennis_smaddpg:
+        build: .
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=0
+        volumes:
+            - .:/app
+        command: >
+            bash -c "cd scripts && python train_tennis_smaddpg.py
+            --api_key <API-KEY>
+            --enable_log 1"
+    train_tennis_ddpg:
+        build: .
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=0
+        volumes:
+            - .:/app
+        command: >
+            bash -c "cd scripts && python train_tennis_ddpg.py
+            --api_key <API-KEY>
+            --enable_log 1"
