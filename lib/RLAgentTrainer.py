@@ -177,8 +177,8 @@ class RLAgentTrainer:
 
         return {
             "states": np.transpose(np.array(s_t0), axes=[1, 0, 2]),
-            "actions": np.transpose(np.array(a_t0), axes=[1, 0, 2]),
-            "action_logits": np.transpose(np.array(al_t0), axes=[1, 0, 2]),
+            "actions": np.transpose(np.array(a_t0), axes=[1, 0]),
+            "action_logits": np.transpose(np.array(al_t0), axes=[1, 0]),
             "log_probs": np.transpose(np.array(pa_t0), axes=[1, 0]),
             "rewards": np.transpose(np.array(r_t1), axes=[1, 0]),
             "next_states": np.transpose(np.array(s_t1), axes=[1, 0, 2]),
@@ -187,11 +187,13 @@ class RLAgentTrainer:
 
     def __log_and_metrics(self, t_sampled):
         max_score = self.trajectory_scores.max()
+        mean_score = self.trajectory_scores.mean()
         self.scores_window.append(max_score)  # save most recent score
         self.scores.append(max_score)  # save most recent score
         if self.logger is not None:
             self.logger.log({
-                "reward": max_score,
+                "mean_reward": mean_score,
+                "max_reward": max_score,
                 "trajectory_length": t_sampled,
                 **self.agent.get_log_dict()
             })
