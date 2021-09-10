@@ -261,7 +261,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
                 ap = action.copy()
                 ap[i_agent] = one_hot
 
-                actions_one_hot = torch.stack([torch.cat([l[i] for l in ap]) for i in range(batch_size)])
+                actions_one_hot = torch.stack([torch.cat([l[i] for l in ap]) for i in range(batch_size)]).to(self.device)
 
                 expected_q_value += torch.log(action_probs[:, i].view(-1, 1)) * agent.critic_local(obs_full, actions_one_hot)
 
