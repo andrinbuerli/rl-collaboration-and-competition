@@ -36,7 +36,7 @@ if __name__ == "__main__":
             "api_key": "",
             "grad_clip_max": None,
             "seed": int(np.random.randint(0, 1e10, 1)[0]),
-            "agent_weights": None
+            "agent_weights": "agents/Soccer-DiscreteMADDPG-7750676833-latest"
         })
 
     env = DualParallelAgentsUnityEnvironment(
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print(f"initialized agent with config: \n {json.dumps(config, sort_keys=True, indent=4)}")
 
     logger = WandbLogger(
-        wandb_project_name="udacity-drlnd-p3-soccer-maddpg-v1",
+        wandb_project_name="udacity-drlnd-p3-soccer-maddpg-v2",
         run_name=None,
         entity="andrinburli",
         api_key=args.api_key,

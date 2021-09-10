@@ -46,7 +46,7 @@ class RLAgentTrainer:
             self,
             n_iterations: int,
             max_t: Union[List[int], int],
-            max_t_iteration:  Union[List[int], int] = None,
+            max_t_iteration: Union[List[int], int] = None,
             intercept: bool = False,
             t_max_episode: int = 1e3):
         """
@@ -62,7 +62,8 @@ class RLAgentTrainer:
         max_mean_score = None
         for i_iter in range(1, n_iterations + 1):
             if type(max_t_original) is list:
-                max_t_index = min([i for i, tresh in enumerate(max_t_iteration) if tresh >= i_iter] + [len(max_t_original) - 1])
+                max_t_index = min(
+                    [i for i, tresh in enumerate(max_t_iteration) if tresh >= i_iter] + [len(max_t_original) - 1])
                 max_t = max_t_original[max_t_index]
 
             trajectory = self.__collect_trajectories(max_t=max_t, intercept=intercept, t_max_episode=t_max_episode)
@@ -143,8 +144,7 @@ class RLAgentTrainer:
                     self.trajectory_scores = np.zeros(self.env.num_agents)
                     self.t_sampled = 0
 
-
-            s_t0.append(self.states), a_t0.append(pred["actions"]), al_t0.append(pred["action_logits"]),\
+            s_t0.append(self.states), a_t0.append(pred["actions"]), al_t0.append(pred["action_logits"]), \
             pa_t0.append(pred["log_probs"]), r_t1.append(rewards), s_t1.append(next_states), d.append(dones)
 
             if any_nan_rewards:
@@ -154,8 +154,8 @@ class RLAgentTrainer:
             self.trajectory_scores = self.trajectory_scores + rewards
             t += 1
             if t >= max_t or np.all(dones):
-                if np.all(dones) or t >= t_max_episode\
-                        or (intercept and self.t_sampled + t >=t_max_episode):
+                if np.all(dones) or t >= t_max_episode \
+                        or (intercept and self.t_sampled + t >= t_max_episode):
                     if intercept:
                         self.__log_and_metrics(self.t_sampled + t)
 
@@ -168,7 +168,6 @@ class RLAgentTrainer:
 
                 if intercept:
                     break
-
 
         if not intercept:
             self.__log_and_metrics(t)
@@ -190,10 +189,20 @@ class RLAgentTrainer:
         mean_score = self.trajectory_scores.mean()
         self.scores_window.append(max_score)  # save most recent score
         self.scores.append(max_score)  # save most recent score
+
+        agent_scores = {}
+        if hasattr(self.env, "brain_names") and isinstance(self.env.brain_names, list):
+            agent_names = [f"{x}{y}" for x, y in
+                           zip(np.repeat(self.env.brain_names, len(self.agent.agents) // len(self.env.brain_names)),
+                               np.tile(range(len(self.env.brain_names)),
+                                       len(self.agent.agents) // len(self.env.brain_names)))]
+            agent_scores = {n: s for n, s in zip(agent_names, self.trajectory_scores)}
+
         if self.logger is not None:
             self.logger.log({
                 "mean_reward": mean_score,
                 "max_reward": max_score,
                 "trajectory_length": t_sampled,
-                **self.agent.get_log_dict()
+                **self.agent.get_log_dict(),
+                **agent_scores
             })
