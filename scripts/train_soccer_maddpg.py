@@ -40,7 +40,7 @@ if __name__ == "__main__":
         })
 
     env = DualParallelAgentsUnityEnvironment(
-        name="Tennis",
+        name="Soccer",
         target_reward=2.5,
         env_binary_path='../environments/Soccer_Linux_NoVis/Soccer.x86_64')
 
