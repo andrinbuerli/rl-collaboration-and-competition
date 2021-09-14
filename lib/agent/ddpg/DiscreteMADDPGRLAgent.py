@@ -145,7 +145,6 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
             actions = [agent.actor_local(obs) for obs, agent in list(zip(states, self.agents))]
         [agent.actor_local.train() for agent in self.agents]
 
-        print(np.array([a.argmax().cpu().detach().numpy() for a in actions]))
         if np.random.rand() < (eps if eps is not None else self.eps):
             actions = np.array([np.random.choice(a_size) for a_size in self.action_size])
         else:
