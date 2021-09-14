@@ -47,7 +47,7 @@ The observation space consists of 336 variables corresponding to 11 ray-casts fo
    ``` bash
    # train a maddpg agent in tennis environment
    docker-compose up train_tennis_maddpg
-   # train a maddpg agent in reacher environment
+   # train a maddpg agent in soccer environment
    docker-compose up train_soccer_maddpg
    ```
 
