@@ -145,6 +145,7 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
             actions = [agent.actor_local(obs) for obs, agent in list(zip(states, self.agents))]
         [agent.actor_local.train() for agent in self.agents]
 
+        print(np.array([a.argmax().cpu().detach().numpy() for a in actions]))
         if np.random.rand() < (eps if eps is not None else self.eps):
             actions = np.array([np.random.choice(a_size) for a_size in self.action_size])
         else:
@@ -246,29 +247,16 @@ class DiscreteMADDPGRLAgent(BaseRLAgent):
 
             action = [
                 agent.actor_local(obs) if i == i_agent\
-                    else torch.nn.functional.one_hot(agent.actor_local(obs).argmax(dim=1), num_classes=a_s)
+                    else agent.actor_local(obs)
                 for i, (obs, agent, a_s) in enumerate(zip(states.transpose(dim0=0, dim1=1), self.agents, self.action_size))
             ]
 
-            action_probs = action[i_agent].to(self.device)
+            actions_one_hot = torch.stack([torch.cat([l[i] for l in action]) for i in range(batch_size)]).to(self.device)
 
-            expected_q_value = torch.zeros((batch_size, 1)).to(self.device)
-
-            action_space_size = action_probs.shape[1]
-            for i in range(action_space_size):
-                one_hot = torch.zeros_like(action_probs)
-                one_hot[:, i] = 1
-                ap = action.copy()
-                ap[i_agent] = one_hot
-
-                actions_one_hot = torch.stack([torch.cat([l[i] for l in ap]) for i in range(batch_size)]).to(self.device)
-
-                expected_q_value += action_probs[:, i].view(-1, 1) * agent.critic_local(obs_full, actions_one_hot)
-
-            actor_loss = -expected_q_value.mean()
+            actor_loss = -agent.critic_local(obs_full, actions_one_hot).mean()
 
             agent.actor_optimizer.zero_grad()
-            actor_loss.mean().backward()
+            actor_loss.backward()
             if self.grad_clip_max is not None:
                 torch.nn.utils.clip_grad_norm_(agent.actor_local.parameters(), self.grad_clip_max)
             agent.actor_optimizer.step()

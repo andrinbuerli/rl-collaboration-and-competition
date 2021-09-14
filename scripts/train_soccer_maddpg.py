@@ -36,7 +36,7 @@ if __name__ == "__main__":
             "api_key": "",
             "grad_clip_max": None,
             "seed": int(np.random.randint(0, 1e10, 1)[0]),
-            "agent_weights": "agents/Soccer-DiscreteMADDPG-7750676833-latest"
+            "agent_weights": None #"agents/Soccer-DiscreteMADDPG-8702318926-latest"
         })
 
     env = DualParallelAgentsUnityEnvironment(
@@ -52,6 +52,8 @@ if __name__ == "__main__":
         state_size=s * env.num_agents,
         action_size=sum(env.action_size.values()),
         seed=int(np.random.randint(0, 1e10, 1)[0]))
+
+    # torch.autograd.set_detect_anomaly(True)
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     agent = DiscreteMADDPGRLAgent(
